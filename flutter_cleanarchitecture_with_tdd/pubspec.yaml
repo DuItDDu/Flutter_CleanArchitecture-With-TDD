@@ -23,7 +23,7 @@ dependencies:
   dartz: ^0.10.1
 
   # Remote API
-  connectivity: ^0.4.3+7
+  data_connection_checker: ^0.3.4
   http: ^0.13.4
 
   # Local cache
