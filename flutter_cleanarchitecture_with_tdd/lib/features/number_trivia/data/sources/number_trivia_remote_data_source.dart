@@ -5,7 +5,7 @@ import 'package:flutter_cleanarchitecture_with_tdd/core/error/exceptions.dart';
 import '../models/number_trivia_model.dart';
 import 'package:http/http.dart' as http;
 
-abstract class NumberTriviaRemoteDataSource {
+abstract class  NumberTriviaRemoteDataSource {
   Future<NumberTriviaModel> getConcreteNumberTrivia(int number);
   Future<NumberTriviaModel> getRandomNumberTrivia();
 }

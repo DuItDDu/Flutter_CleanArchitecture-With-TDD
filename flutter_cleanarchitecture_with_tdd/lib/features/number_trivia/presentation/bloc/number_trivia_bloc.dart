@@ -14,20 +14,13 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
   final GetRandomNumberTrivia getRandomNumberTrivia;
   final InputConverter inputConverter;
 
-  NumberTriviaBloc(
-      {required this.getConcreteNumberTrivia,
-      required this.getRandomNumberTrivia,
-      required this.inputConverter})
-      : super(Empty()) {
-    on<NumberTriviaEvent>(_onEvent);
-  }
-
-  void _onEvent(NumberTriviaEvent event, Emitter<NumberTriviaState> emit) async {
-    if (event is GetTriviaForConcreteNumber) {
-      _onGetTriviaForConcreteNumberEvent(event, emit);
-    } else if (event is GetTriviaForRandomNumber) {
-      _onGetTriviaForRandomNumberEvent(event, emit);
-    }
+  NumberTriviaBloc({
+    required this.getConcreteNumberTrivia,
+    required this.getRandomNumberTrivia,
+    required this.inputConverter
+  }) : super(Empty()) {
+    on<GetTriviaForConcreteNumber>(_onGetTriviaForConcreteNumberEvent);
+    on<GetTriviaForRandomNumber>(_onGetTriviaForRandomNumberEvent);
   }
 
   void _onGetTriviaForConcreteNumberEvent(
@@ -36,7 +29,7 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
   ) async {
     inputConverter.stringToUnsignedInteger(event.inputNumber).fold(
             (failure) => emit(Error(msg: "Invalid Input")),
-            (number) => _handleGetTrivia(emit, () => getConcreteNumberTrivia(Params(number: number)))
+            (number) => _emitNumberTriviaState(emit, () => getConcreteNumberTrivia(Params(number: number)))
     );
   }
 
@@ -44,18 +37,17 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
       GetTriviaForRandomNumber event,
       Emitter<NumberTriviaState> emit
   ) async {
-    _handleGetTrivia(emit, () => getRandomNumberTrivia(EmptyParams()));
+    _emitNumberTriviaState(emit, () => getRandomNumberTrivia(EmptyParams()));
   }
 
-
-  void _handleGetTrivia(
+  void _emitNumberTriviaState(
       Emitter<NumberTriviaState> emit,
       Future<Either<Failure, NumberTrivia>> Function() getNumberTrivia
   ) async {
     emit(Loading());
     final result = await getNumberTrivia();
     result.fold(
-            (failure) => Error(msg: _mapFailureMessage(failure)),
+            (failure) => emit(Error(msg: _mapFailureMessage(failure))),
             (trivia) => emit(Loaded(trivia: trivia))
     );
   }
